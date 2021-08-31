@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import  connectDB  from './db/db'
 import  publicRoutes  from './routes/public'
+import {PORT} from "./config/config"
 
 dotenv.config()
 const app = express()
@@ -22,8 +23,7 @@ app.use((req: Request, res: Response)=>{
     res.status(500).json({error: true, msg: 'Request URL not found'})
 })
 
-const port = process.env.PORT || 5000
 
-app.listen(port, () => {
-    console.log(`Server Runnaing on the port ${port}`);
+app.listen(PORT, () => {
+    console.log(`Server Runnaing on the PORT ${PORT}`);
 })
