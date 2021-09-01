@@ -6,12 +6,11 @@ const router = express.Router()
 
 import ImageController from '../controllers/image'
 
-// import RoomController from '../controllers/roomController'
 
 router.get('/all-images', ImageController.getAllImage)
 router.post('/add-image', file.uploadFile, ImageController.addImage)
+router.post('/add-image-url', file.form, ImageController.addImageByLink)
 router.get('/image/:id', ImageController.getImage)
-router.get('/get-image/:slug', ImageController.getImageBySlug)
 router.delete('/remove-image/:id', ImageController.removeImage)
 
 export default router;

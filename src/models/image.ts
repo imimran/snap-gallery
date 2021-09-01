@@ -1,17 +1,19 @@
-import mongoose, {Schema} from 'mongoose';
-
+'use strict'
+import { model, Model, Schema} from 'mongoose';
 import IImage from '../interfaces/image';
+
 
 const ImageSchema: Schema = new Schema({
     title:{
         type: String,
-        required:true
+        required:false
     },
-    slug:{
-        type: String,
-        required:true
-    },
+
     imageURL:{
+        type: String,
+        required:false
+    },
+    imageFullURL:{
         type: String,
         required:true
     }
@@ -20,6 +22,7 @@ const ImageSchema: Schema = new Schema({
     timestamps: true
 })
 
-const Image = mongoose.model<IImage>('images', ImageSchema)
+
+const Image: Model<IImage>= model<IImage>('images', ImageSchema)
 
 export default Image;
