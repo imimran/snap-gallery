@@ -6,28 +6,29 @@ import fs from 'fs'
 
 
 
-const getAllImage = async (req: Request, res: Response) => {
-    try {
-        const images = await Image.find({})
-        // .select({ _id: 0, __v: 0})
+const getAllImage = (req: Request, res: Response) => {
 
-        // let imagesDummy = [];
-
-        // for await (let image of images) {
-        //     if (image.imageURL) {
-        //         image.imageURL = APP_URL + image.imageURL;
-        //     }
-        //     imagesDummy.push(image);
-        // }
-
-        // console.log('images', images);
+    const perPage = 4
+    let page = parseInt(req.query.page as string) || 0 as any
 
 
-        return res.status(200).json({ error: false, data: images })
-    } catch (error) {
-        console.log(error);
-        return res.status(200).json({ error: true, msg: "Server Error" })
-    }
+    Image.find()
+        .limit(perPage)
+        .skip(perPage * page)
+        .sort('-createdAt')
+        .exec(function (err, images) {
+            Image.count()
+                .exec(function (err, count) {
+                    if (err) { res.status(500).json({ error: true, msg: "Server Error" }); return; };
+                    res.status(200).json({
+                        image_list: images,
+                        page: page,
+                        pages: Math.ceil(count / perPage)
+                    });
+
+                })
+        })
+
 
 }
 
@@ -41,7 +42,7 @@ const getImage = async (req: Request, res: Response) => {
         const image = await Image.findById({ _id: imageId }
         ).select({ _id: 0, __v: 0 })
 
-        return res.status(200).json({ error: false, data:image  })
+        return res.status(200).json({ error: false, data: image })
 
     } catch (error) {
         console.log(error);
@@ -64,7 +65,7 @@ const addImage = async (req: Request, res: Response) => {
         const file = req.file.filename
         const ext = path.extname(file).split(".");
         const file_type = ext[1]
- 
+
         const file_name = file.replace(file_type, "").split('.')
 
         const image_title = file_name[0]
@@ -86,9 +87,9 @@ const addImage = async (req: Request, res: Response) => {
 const addImageByLink = async (req: Request, res: Response) => {
     try {
 
-        let {imageFullURL} = req.body
+        let { imageFullURL } = req.body
 
-        if(imageFullURL== undefined || imageFullURL== null || imageFullURL== ''){
+        if (imageFullURL == undefined || imageFullURL == null || imageFullURL == '') {
             return res.status(401).json({ error: true, msg: "Image URL requried" })
         }
 
@@ -101,9 +102,7 @@ const addImageByLink = async (req: Request, res: Response) => {
         console.log(error);
         return res.status(200).json({ error: true, msg: "Server Error" })
     }
-}   
-
-
+}
 
 const removeImage = async (req: Request, res: Response) => {
     try {
@@ -113,9 +112,9 @@ const removeImage = async (req: Request, res: Response) => {
             return res.status(404).json({ error: true, msg: "Image not found" })
         }
         const image = await Image.findByIdAndRemove({ _id: imageId })
-        
-        if(image?.imageURL){
-        fs.unlinkSync(`${image?.imageURL}`);
+
+        if (image?.imageURL) {
+            fs.unlinkSync(`${image?.imageURL}`);
         }
 
         return res.status(200).json({ error: false, msg: "Delete Successfuly" })
@@ -125,11 +124,30 @@ const removeImage = async (req: Request, res: Response) => {
     }
 }
 
+const filterData = async (req: Request, res: Response) => {
+
+    try {
+        var d = new Date();
+        d.setDate(d.getDate() - 7);
+
+        const data = await Image.count({ "createdAt": { $gt: d } })
+        return res.status(200).json({ error: false, data: data })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(200).json({ error: true, msg: "Server Error" })
+    }
+
+
+
+}
+
 
 export default {
     getAllImage,
     getImage,
     removeImage,
     addImage,
-    addImageByLink
+    addImageByLink,
+    filterData
 }

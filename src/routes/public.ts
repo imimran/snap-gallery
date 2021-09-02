@@ -8,6 +8,7 @@ import ImageController from '../controllers/image'
 
 
 router.get('/all-images', ImageController.getAllImage)
+router.get('/stats', ImageController.filterData)
 router.post('/add-image', file.uploadFile, ImageController.addImage)
 router.post('/add-image-url', file.form, ImageController.addImageByLink)
 router.get('/image/:id', ImageController.getImage)
