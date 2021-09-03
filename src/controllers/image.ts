@@ -158,14 +158,25 @@ const filterData = async (req: Request, res: Response) => {
                 count: 1,
                 date: "$_id",
                 _id: 0
+                
             }
         }
     ])
         .exec(function (err, image) {
+           const result = Object.fromEntries(Object
+                .entries(image.reduce((r, { date, count }) => {
+                    r[date] ??= 0;
+                    r[date] += count || -1;
+                    return r;
+                }, {}))
+                .map(([k, v]) => [k, v])
+            );
+        
             if (err) { res.status(500).json({ error: true, msg: "Server Error" }); return; };
             res.status(200).json({
                 error: false,
                 last_week: image,
+                result: result
 
             });
         })
