@@ -125,22 +125,62 @@ const removeImage = async (req: Request, res: Response) => {
 }
 
 const filterData = async (req: Request, res: Response) => {
+    var d = new Date();
+    d.setDate(d.getDate() - 7);
+    // try {
+    Image.aggregate([
 
-    try {
-        var d = new Date();
-        d.setDate(d.getDate() - 7);
+        { $match: { 'createdAt': { $gt: d } } },
+        {
 
-        const data = await Image.count({ "createdAt": { $gt: d } })
-        return res.status(200).json({ error: false, data: data })
+            $addFields: {
+                createdAtDate: {
+                    $toDate: "$createdAt"
+                },
 
-    } catch (error) {
-        console.log(error);
-        return res.status(200).json({ error: true, msg: "Server Error" })
-    }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    $dateToString: {
+                        format: "%Y-%m-%d",
+                        date: "$createdAtDate"
+                    }
+                },
+                count: {
+                    $sum: 1
+                }
+            }
+        },
+        {
+            $project: {
+                count: 1,
+                date: "$_id",
+                _id: 0
+            }
+        }
+    ])
+        .exec(function (err, image) {
+            if (err) { res.status(500).json({ error: true, msg: "Server Error" }); return; };
+            res.status(200).json({
+                error: false,
+                last_week: image,
 
+            });
+        })
 
+    // console.log(userData)
+    // return res.status(200).json({ error: false, data: data })
 
+    // } catch (error) {
+    //     console.log(error);
+    //     return res.status(200).json({ error: true, msg: "Server Error" })
+    // }
 }
+
+
+
 
 
 export default {
