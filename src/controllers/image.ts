@@ -74,7 +74,7 @@ const addImage = async (req: Request, res: Response) => {
         const image = new Image({
             title: image_title,
             imageURL: req.file.path,
-            imageFullURL: APP_URL + req.file.path
+            imageFullURL: APP_URL + req.file.filename
         })
         await image.save()
         return res.status(201).json({ error: false, msg: "Add Succesfully", data: image })
