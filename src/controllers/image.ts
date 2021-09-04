@@ -8,7 +8,7 @@ import fs from 'fs'
 
 const getAllImage = (req: Request, res: Response) => {
 
-    const perPage = 4
+    const perPage = 12
     let page = parseInt(req.query.page as string) || 0 as any
 
 
@@ -106,6 +106,7 @@ const addImageByLink = async (req: Request, res: Response) => {
 
 const removeImage = async (req: Request, res: Response) => {
     try {
+        
         const imageId = req.params.id
         const findImage = await Image.findOne({ _id: imageId })
         if (!findImage) {
@@ -120,7 +121,7 @@ const removeImage = async (req: Request, res: Response) => {
         return res.status(200).json({ error: false, msg: "Delete Successfuly" })
     } catch (error) {
         console.log(error);
-        return res.status(200).json({ error: true, msg: "Server Error" })
+        return res.status(500).json({ error: true, msg: "Server Error" })
     }
 }
 
