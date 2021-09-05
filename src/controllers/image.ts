@@ -176,7 +176,6 @@ const filterData = async (req: Request, res: Response) => {
             if (err) { res.status(500).json({ error: true, msg: "Server Error" }); return; };
             res.status(200).json({
                 error: false,
-                last_week: image,
                 result: result
 
             });
